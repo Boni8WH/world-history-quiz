@@ -255,3 +255,55 @@ overflow: hidden; / 追加 /
 .secondary-button:hover {
     background-color: #7f8c8d;
 }
+
+/* 既存のstyle.cssに以下を追加または修正 */
+
+.card-text {
+    font-size: 1.6em;
+    margin-bottom: 20px;
+    color: #34495e;
+    min-height: 80px; /* ★追加または修正: 問題文と答えの最小高さを設定 */
+    display: flex; /* テキストの垂直方向中央揃えのため */
+    align-items: center; /* テキストの垂直方向中央揃えのため */
+    justify-content: center; /* テキストの水平方向中央揃えのため */
+    text-align: center; /* テキストの水平方向中央揃えのため */
+    word-wrap: break-word; /* 長い単語の折り返し */
+    white-space: pre-wrap; /* 改行コードを尊重 */
+}
+
+/* card-area内のボタン群の調整 */
+.button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    margin-bottom: 20px; /* この値を少し増やして、次のボタンとの間隔を確保 */
+    flex-wrap: wrap;
+}
+
+/* 範囲選択に戻るボタンのスタイル */
+.secondary-button {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    margin-top: 15px; /* 上部の余白で位置調整 */
+    transition: background-color 0.3s ease;
+}
+
+.secondary-button:hover {
+    background-color: #7f8c8d;
+}
+
+/* 必要であれば、.card-area自体のpadding-bottomも調整して、一番下のボタンとの間隔を確保 */
+.card-area {
+    background-color: #ffffff;
+    padding: 30px; /* 必要であればpadding-bottomを調整 */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+}
