@@ -194,8 +194,6 @@ overflow: hidden; / 追加 /
     margin-right: 8px;
 }
 
-/* 既存のstyle.cssに以下を追加・修正 */
-
 .question-count-selection {
     margin-bottom: 25px;
     padding: 15px;
