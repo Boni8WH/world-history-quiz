@@ -1,0 +1,261 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f7f6;
+    margin: 0;
+    color: #333;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.selection-area {
+    margin-bottom: 30px;
+}
+
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    background-color: #ecf0f1;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.category-item:hover {
+    background-color: #dde1e2;
+}
+
+.category-item input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.card-area {
+    min-height: 200px; /* カードの高さ確保 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    border: 2px solid #bdc3c7;
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+}
+
+.card-text {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin: 10px 0;
+    word-wrap: break-word; /* 長い単語の折り返し */
+    max-width: 90%;
+}
+
+.card-text.hidden {
+    display: none;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin: 10px 10px; /* ボタン間のスペース */
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+#message {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #e74c3c;
+}
+
+/* 既存のCSSに以下を追加または修正 */
+
+.chapters-container {
+    margin-top: 20px;
+    text-align: left; /* 左寄せにする */
+}
+
+.chapter-item {
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden; /* コンテンツがはみ出さないように */
+}
+
+.chapter-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    background-color: #bdc3c7;
+    color: #2c3e50;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.chapter-header:hover {
+    background-color: #aeb5b8;
+}
+
+.chapter-header .chapter-title {
+    flex-grow: 1; /* タイトルが余白を占める */
+}
+
+.chapter-header .toggle-icon {
+    font-size: 1.5em;
+    margin-left: 10px;
+    transition: transform 0.3s ease;
+}
+
+.chapter-header.expanded .toggle-icon {
+    transform: rotate(90deg); /* 展開時に矢印を回転 */
+}
+
+.chapter-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; /* 右寄せ */
+}
+
+.chapter-options button {
+    padding: 6px 12px;
+    font-size: 0.9em;
+    margin: 0; /* マージンを調整 */
+}
+
+.unit-list {
+    padding: 10px 15px;
+    background-color: #f8f8f8;
+    max-height: 0; /* デフォルトでは非表示 */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* スムーズなアニメーション */
+}
+
+.chapter-header.expanded + .unit-list {
+    max-height: 500px; /* 展開時の最大高さを設定（コンテンツに合わせて調整） */
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.unit-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.unit-item:last-child {
+    margin-bottom: 0;
+}
+
+.unit-item input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* 既存のstyle.cssに以下を追加・修正 */
+
+.question-count-selection {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+}
+
+.question-count-selection h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #34495e;
+}
+
+.count-options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap; /* 小さい画面で折り返す */
+}
+
+.count-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+.count-item input[type="radio"] {
+    margin-right: 8px;
+    transform: scale(1.2); /* ラジオボタンを少し大きく */
+}
+
+/* カード表示エリアのボタン間隔調整 */
+.button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px; /* 上部の余白 */
+    margin-bottom: 20px; /* 下部の余白 */
+    flex-wrap: wrap; /* 小さい画面で折り返す */
+}
+
+.button-group button {
+    margin: 5px 10px; /* ボタン間のスペース */
+}
+
+/* 範囲選択に戻るボタンのスタイル */
+.secondary-button {
+    background-color: #95a5a6; /* 少し暗い色 */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.secondary-button:hover {
+    background-color: #7f8c8d;
+}

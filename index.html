@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界史めくる単語帳</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>世界史めくる単語帳</h1>
+
+        <div class="selection-area">
+            <h2>出題範囲を選択</h2>
+            
+            <div class="question-count-selection">
+                <h3>出題数を選択</h3>
+                <div class="count-options">
+                    <label class="count-item">
+                        <input type="radio" name="questionCount" value="10" checked> 10問
+                    </label>
+                    <label class="count-item">
+                        <input type="radio" name="questionCount" value="20"> 20問
+                    </label>
+                    <label class="count-item">
+                        <input type="radio" name="questionCount" value="50"> 50問
+                    </label>
+                    <label class="count-item">
+                        <input type="radio" name="questionCount" value="all"> 全問
+                    </label>
+                </div>
+            </div>
+
+            <div class="chapters-container">
+                </div>
+            <button id="startButton">学習開始</button>
+        </div>
+
+        <div class="card-area" style="display: none;">
+            <p id="question" class="card-text"></p>
+            <p id="answer" class="card-text hidden"></p>
+            <div class="button-group">
+                <button id="toggleButton">答えを見る</button>
+                <button id="nextButton">次の問題へ</button>
+            </div>
+            <button id="backToSelectionButton" class="secondary-button">範囲選択に戻る</button> 
+        </div>
+
+        <p id="message"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
