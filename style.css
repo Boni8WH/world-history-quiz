@@ -167,17 +167,17 @@ overflow: hidden; / 追加 /
 }
 
 .unit-list {
-    padding: 10px 15px;
+    padding: 0 15px; /* 上下のパディングを0に変更 */
     background-color: #f8f8f8;
-    max-height: 0; /* デフォルトでは非表示 */
+    max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease-out, padding 0.3s ease-out; /* スムーズなアニメーション */
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
 }
 
 .chapter-header.expanded + .unit-list {
-    max-height: 500px; /* 展開時の最大高さを設定（コンテンツに合わせて調整） */
-    padding-top: 15px;
-    padding-bottom: 15px;
+    max-height: 500px;
+    padding-top: 15px; /* 展開時にパディングを適用 */
+    padding-bottom: 15px; /* 展開時にパディングを適用 */
 }
 
 .unit-item {
