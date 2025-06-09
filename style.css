@@ -111,18 +111,16 @@ button:active {
     color: #e74c3c;
 }
 
-/* 既存のCSSに以下を追加または修正 */
-
 .chapters-container {
     margin-top: 20px;
     text-align: left; /* 左寄せにする */
 }
 
 .chapter-item {
-    background-color: #ecf0f1;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    overflow: hidden; /* コンテンツがはみ出さないように */
+background-color: #ecf0f1;
+border-radius: 8px;
+margin-bottom: 10px;
+overflow: hidden; / 追加 /
 }
 
 .chapter-header {
