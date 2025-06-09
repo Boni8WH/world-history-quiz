@@ -201,7 +201,7 @@ startButton.addEventListener('click', () => {
 toggleButton.addEventListener('click', () => {
     if (isQuestionDisplayed) {
         answerText.classList.remove('hidden');
-        toggleButton.textContent = '問題を見る';
+        toggleButton.textContent = '隠す';
         isQuestionDisplayed = false;
     } else {
         answerText.classList.add('hidden');
