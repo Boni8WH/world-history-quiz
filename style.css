@@ -256,31 +256,35 @@ overflow: hidden; / 追加 /
     background-color: #7f8c8d;
 }
 
-/* 既存のstyle.cssに以下を追加または修正 */
+/* 既存のstyle.cssに以下を追加または修正・確認 */
 
 .card-text {
     font-size: 1.6em;
     margin-bottom: 20px;
     color: #34495e;
-    min-height: 80px; /* ★追加または修正: 問題文と答えの最小高さを設定 */
-    display: flex; /* テキストの垂直方向中央揃えのため */
-    align-items: center; /* テキストの垂直方向中央揃えのため */
-    justify-content: center; /* テキストの水平方向中央揃えのため */
-    text-align: center; /* テキストの水平方向中央揃えのため */
-    word-wrap: break-word; /* 長い単語の折り返し */
-    white-space: pre-wrap; /* 改行コードを尊重 */
+    min-height: 80px; /* ★ここを修正または追加: 問題文と答えの最小高さを設定。適切な高さに調整してください */
+    display: flex; /* ★追加: テキストの垂直方向中央揃えのため */
+    align-items: center; /* ★追加: テキストの垂直方向中央揃えのため */
+    justify-content: center; /* ★追加: テキストの水平方向中央揃えのため */
+    text-align: center; /* ★追加: テキストの水平方向中央揃えのため (flexboxのjustify-contentと併用) */
+    word-wrap: break-word; /* ★追加: 長い単語や文が枠からはみ出さずに折り返す */
+    white-space: pre-wrap; /* ★追加: CSV内の改行コード (`\n`) を反映させる */
 }
 
-/* card-area内のボタン群の調整 */
+/* カード表示エリアのボタン間隔調整 (以前の指示とほぼ同じですが、再確認) */
 .button-group {
     display: flex;
     justify-content: center;
-    margin-top: 15px;
-    margin-bottom: 20px; /* この値を少し増やして、次のボタンとの間隔を確保 */
-    flex-wrap: wrap;
+    margin-top: 15px; /* 上部の余白 */
+    margin-bottom: 20px; /* 下部の余白。もしボタン間のスペースが足りなければ調整 */
+    flex-wrap: wrap; /* 小さい画面で折り返す */
 }
 
-/* 範囲選択に戻るボタンのスタイル */
+.button-group button {
+    margin: 5px 10px; /* ボタン間のスペース */
+}
+
+/* 範囲選択に戻るボタンのスタイル (以前の指示とほぼ同じですが、再確認) */
 .secondary-button {
     background-color: #95a5a6;
     color: white;
@@ -289,7 +293,7 @@ overflow: hidden; / 追加 /
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.95em;
-    margin-top: 15px; /* 上部の余白で位置調整 */
+    margin-top: 15px; /* 上部の余白で位置調整。必要であれば調整 */
     transition: background-color 0.3s ease;
 }
 
@@ -297,13 +301,15 @@ overflow: hidden; / 追加 /
     background-color: #7f8c8d;
 }
 
-/* 必要であれば、.card-area自体のpadding-bottomも調整して、一番下のボタンとの間隔を確保 */
+/* card-area自体のpadding-bottomも調整して、一番下のボタンとの間隔を確保 */
 .card-area {
     background-color: #ffffff;
-    padding: 30px; /* 必要であればpadding-bottomを調整 */
+    padding: 30px; /* もし全体の枠の高さがまだ変動するようであれば、padding-bottomを調整 */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 90%;
     max-width: 600px;
+    /* 必要であれば、max-widthを超えた場合の横スクロールバーや、コンテンツがはみ出さないためのoverflow-x: hidden; */
+    /* overflow-x: hidden; */
 }
