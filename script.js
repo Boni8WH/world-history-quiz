@@ -12,15 +12,28 @@ const answerText = document.getElementById('answer');
 const toggleButton = document.getElementById('toggleButton');
 const nextButton = document.getElementById('nextButton');
 const messageText = document.getElementById('message');
-const backToSelectionButton = document.getElementById('backToSelectionButton'); // 新規取得
+const backToSelectionButton = document.getElementById('backToSelectionButton');
+
+// 新規取得: 進捗表示、正誤判定ボタン、結果エリア関連
+const progressText = document.getElementById('progressText'); // 進捗表示
+const correctButton = document.getElementById('correctButton'); // 分かったボタン
+const incorrectButton = document.getElementById('incorrectButton'); // 分からなかったボタン
+const resultsArea = document.querySelector('.results-area'); // 結果表示エリア
+const resultSummary = document.getElementById('resultSummary'); // 結果サマリー
+const incorrectWordsList = document.getElementById('incorrectWordsList'); // 間違えた単語リスト
+const restartLearningButton = document.getElementById('restartLearningButton'); // 結果画面からの再学習ボタン
+const backToSelectionFromResults = document.getElementById('backToSelectionFromResults'); // 結果画面からの範囲選択に戻るボタン
+
 
 // 出題数選択ラジオボタンの取得
-const questionCountRadios = document.querySelectorAll('input[name="questionCount"]'); // 新規取得
+const questionCountRadios = document.querySelectorAll('input[name="questionCount"]');
 
 let currentWordIndex = 0;
 let selectedWords = []; // 選択された単元からフィルタリングされた全単語
 let wordsForQuiz = []; // 実際にクイズに出題する単語（出題数で調整されたもの）
-let isQuestionDisplayed = true;
+let isQuestionDisplayed = true; // 現在問題が表示されているか (答えが隠れているか)
+let correctAnswersCount = 0; // 正解した単語の数
+let incorrectWords = []; // 間違えた単語を格納する配列
 
 // ----------------------------------------------------
 // 初期化処理：DOMが読み込まれたら単語データを読み込む
@@ -40,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // データの読み込みと準備が完了したら、カテゴリ選択肢を生成
             generateChapterSelection();
+            // ローカルストレージから前回の選択状態を復元
+            loadSelectionFromLocalStorage();
         })
         .catch(error => {
             console.error('単語データの読み込みに失敗しました:', error);
@@ -66,7 +81,7 @@ function buildChapterData(data) {
             };
         }
         if (!chapters[chapterNum].units[unitNum]) {
-             chapters[chapterNum].units[unitNum] = {
+            chapters[chapterNum].units[unitNum] = {
                 categoryName: unitCategory,
                 words: []
             };
@@ -157,7 +172,7 @@ function generateChapterSelection() {
 
 startButton.addEventListener('click', () => {
     const selectedUnitNumbers = Array.from(document.querySelectorAll('.unit-list input[type="checkbox"]:checked'))
-                                     .map(checkbox => checkbox.value);
+                                           .map(checkbox => checkbox.value);
     
     if (selectedUnitNumbers.length === 0) {
         alert('出題範囲（単元）を一つ以上選択してください。');
@@ -174,6 +189,9 @@ startButton.addEventListener('click', () => {
     // 出題数を取得
     let selectedCount = document.querySelector('input[name="questionCount"]:checked').value;
     
+    // 選択された単元と出題数をローカルストレージに保存
+    saveSelectionToLocalStorage(selectedUnitNumbers, selectedCount);
+
     // selectedWordsをシャッフル
     shuffleArray(selectedWords);
 
@@ -189,10 +207,12 @@ startButton.addEventListener('click', () => {
         }
     }
 
-
     currentWordIndex = 0;
+    correctAnswersCount = 0; // 正答数をリセット
+    incorrectWords = []; // 間違えた単語リストをリセット
 
     selectionArea.style.display = 'none';
+    resultsArea.style.display = 'none'; // 結果エリアが表示されていたら非表示にする
     cardArea.style.display = 'flex';
 
     displayCurrentWord();
@@ -200,31 +220,49 @@ startButton.addEventListener('click', () => {
 
 toggleButton.addEventListener('click', () => {
     if (isQuestionDisplayed) {
+        // 答えを表示
         answerText.classList.remove('hidden');
         toggleButton.textContent = '隠す';
         isQuestionDisplayed = false;
+        // 答えを見たので正誤判定ボタンと次の問題ボタンを表示
+        correctButton.style.display = 'inline-block';
+        incorrectButton.style.display = 'inline-block';
+        nextButton.style.display = 'none'; // 次の問題は正誤判定後に押させる
     } else {
+        // 答えを隠す
         answerText.classList.add('hidden');
         toggleButton.textContent = '答えを見る';
         isQuestionDisplayed = true;
+        // 答えを隠したので正誤判定ボタンと次の問題ボタンを非表示
+        correctButton.style.display = 'none';
+        incorrectButton.style.display = 'none';
+        // (厳密にはここでは次の問題ボタンは表示しない。正誤判定後の状態に戻すだけ)
     }
 });
 
-nextButton.addEventListener('click', () => {
-    currentWordIndex++;
+// 正誤判定ボタンのイベントリスナー
+correctButton.addEventListener('click', () => {
+    correctAnswersCount++; // 正答数をインクリメント
+    moveToNextQuestion();
+});
 
-    // 次の単語に進む際はwordsForQuizを使用
+incorrectButton.addEventListener('click', () => {
+    incorrectWords.push(wordsForQuiz[currentWordIndex]); // 間違えた単語を記録
+    moveToNextQuestion();
+});
+
+
+// 次の単語へ進む共通ロジック
+function moveToNextQuestion() {
+    currentWordIndex++;
     if (currentWordIndex < wordsForQuiz.length) {
         displayCurrentWord();
     } else {
         // 全ての単語が終了した場合
-        cardArea.style.display = 'none';
-        messageText.textContent = `学習終了！${wordsForQuiz.length}問を学習しました。お疲れ様でした。`;
-        messageText.style.color = '#27ae60';
-        startButton.textContent = 'もう一度学習する'; // 「学習開始」ボタンのテキストを「もう一度学習する」に戻す
-        selectionArea.style.display = 'block'; // 選択画面に戻る
+        showResults();
     }
-});
+}
+
 
 // 新規追加：範囲選択に戻るボタンのイベントリスナー
 backToSelectionButton.addEventListener('click', () => {
@@ -233,21 +271,110 @@ backToSelectionButton.addEventListener('click', () => {
     messageText.textContent = ''; // メッセージをクリア
 });
 
+// 新規追加：結果画面からの「もう一度学習する」ボタン
+restartLearningButton.addEventListener('click', () => {
+    // startButton と同じロジックを呼び出すか、直接処理を記述
+    // ここでは、現在の選択範囲と出題数で再学習を開始する
+    startButton.click(); // startButtonのクリックイベントを発火させる
+});
+
+// 新規追加：結果画面からの「範囲選択に戻る」ボタン
+backToSelectionFromResults.addEventListener('click', () => {
+    resultsArea.style.display = 'none'; // 結果エリアを非表示
+    selectionArea.style.display = 'block'; // 選択エリアを表示
+    messageText.textContent = ''; // メッセージをクリア
+});
 
 // ----------------------------------------------------
-// ヘルパー関数 (parseCSV関数は変更なし)
+// ヘルパー関数
 // ----------------------------------------------------
+
+// ローカルストレージに選択状態を保存する関数
+function saveSelectionToLocalStorage(selectedUnitNumbers, selectedCount) {
+    localStorage.setItem('selectedUnits', JSON.stringify(selectedUnitNumbers));
+    localStorage.setItem('questionCount', selectedCount);
+}
+
+// ローカルストレージから選択状態を読み込む関数
+function loadSelectionFromLocalStorage() {
+    const savedUnits = localStorage.getItem('selectedUnits');
+    const savedCount = localStorage.getItem('questionCount');
+
+    if (savedUnits) {
+        const selectedUnitNumbers = JSON.parse(savedUnits);
+        // 保存された単元をチェックボックスに反映
+        document.querySelectorAll('.unit-list input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = selectedUnitNumbers.includes(checkbox.value);
+        });
+        // 必要に応じて、章を自動的に展開するかどうかを検討
+        // 例: 選択されている単元を含む章を展開する
+        selectedUnitNumbers.forEach(unitNum => {
+            const checkbox = document.getElementById(`unit--${unitNum}`); // IDは一意にする必要がある
+            if (checkbox) {
+                const chapterItem = checkbox.closest('.chapter-item');
+                if (chapterItem) {
+                    chapterItem.querySelector('.chapter-header').classList.add('expanded');
+                }
+            }
+        });
+    }
+
+    if (savedCount) {
+        // 保存された出題数をラジオボタンに反映
+        document.querySelectorAll('input[name="questionCount"]').forEach(radio => {
+            if (radio.value === savedCount) {
+                radio.checked = true;
+            }
+        });
+    }
+}
+
 
 function displayCurrentWord() {
-    // 表示する単語はwordsForQuizから取得
     const currentWord = wordsForQuiz[currentWordIndex];
     questionText.textContent = currentWord.question;
     answerText.textContent = currentWord.answer;
-    answerText.classList.add('hidden');
+    answerText.classList.add('hidden'); // 答えは常に隠す
     toggleButton.textContent = '答えを見る';
     isQuestionDisplayed = true;
     messageText.textContent = '';
+
+    // 正誤判定ボタンと次の問題ボタンの表示をリセット
+    correctButton.style.display = 'none';
+    incorrectButton.style.display = 'none';
+    nextButton.style.display = 'none'; // 通常の「次の問題へ」は非表示にする
+    toggleButton.style.display = 'inline-block'; // 答えを見るボタンは常に表示
+
+    // 進捗表示を更新
+    progressText.textContent = `${currentWordIndex + 1} / ${wordsForQuiz.length} 問`;
 }
+
+// 学習結果を表示する関数
+function showResults() {
+    cardArea.style.display = 'none';
+    resultsArea.style.display = 'block';
+
+    const totalQuestions = wordsForQuiz.length;
+    const correctPercentage = totalQuestions > 0 ? ((correctAnswersCount / totalQuestions) * 100).toFixed(1) : 0;
+
+    resultSummary.innerHTML = `全 ${totalQuestions} 問中、**${correctAnswersCount} 問** 正解しました。<br>正答率: **${correctPercentage}%**`;
+
+    incorrectWordsList.innerHTML = ''; // リストをクリア
+    if (incorrectWords.length > 0) {
+        incorrectWords.forEach(word => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `**${word.question}** - ${word.answer}`;
+            incorrectWordsList.appendChild(listItem);
+        });
+    } else {
+        const listItem = document.createElement('li');
+        listItem.textContent = '間違えた単語はありません！素晴らしい！';
+        incorrectWordsList.appendChild(listItem);
+    }
+    // メッセージもクリアしておく
+    messageText.textContent = '';
+}
+
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
