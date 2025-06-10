@@ -1,301 +1,268 @@
-// 単語データは外部ファイルから読み込むため、ここでは定義しない  
-let wordData = []; // 初期化  
-let chapterData = {}; // 章とそれに属する単元の情報を格納するオブジェクト  
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; 
+    background-color: #f4f7f6; 
+    margin: 0; 
+    color: #333; 
+} 
 
-// アプリの要素を取得  
-const selectionArea = document.querySelector('.selection-area');  
-const chaptersContainer = document.querySelector('.chapters-container');  
-const startButton = document.getElementById('startButton');  
-const cardArea = document.querySelector('.card-area');  
-const questionText = document.getElementById('question');  
-const answerText = document.getElementById('answer');  
-const toggleButton = document.getElementById('toggleButton');  
-const nextButton = document.getElementById('nextButton');  
-const messageText = document.getElementById('message');  
-const backToSelectionButton = document.getElementById('backToSelectionButton'); // 新規取得  
+.container { 
+    background-color: #ffffff; 
+    padding: 30px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    text-align: center; 
+    width: 90%; 
+    max-width: 600px; 
+} 
 
-// 出題数選択ラジオボタンの取得  
-const questionCountRadios = document.querySelectorAll('input[name="questionCount"]'); // 新規取得  
+h1 { 
+    color: #2c3e50; 
+    margin-bottom: 25px; 
+} 
 
-let currentWordIndex = 0;  
-let selectedWords = []; // 選択された単元からフィルタリングされた全単語  
-let wordsForQuiz = []; // 実際にクイズに出題する単語（出題数で調整されたもの）  
-let isQuestionDisplayed = true;  
+h2 { 
+    color: #34495e; 
+    margin-top: 30px; 
+    margin-bottom: 15px; 
+} 
 
-// ----------------------------------------------------  
-// 初期化処理：DOMが読み込まれたら単語データを読み込む  
-// ----------------------------------------------------  
-document.addEventListener('DOMContentLoaded', () => {  
-    fetch('words.csv')  
-        .then(response => {  
-            if (!response.ok) {  
-                throw new Error(`HTTP error! status: ${response.status}`);  
-            }  
-            return response.text();  
-        })  
-        .then(csvText => {  
-            wordData = parseCSV(csvText);  
-            // chapterDataを構築  
-            chapterData = buildChapterData(wordData);  
-              
-            // データの読み込みと準備が完了したら、カテゴリ選択肢を生成  
-            generateChapterSelection();  
-        })  
-        .catch(error => {  
-            console.error('単語データの読み込みに失敗しました:', error);  
-            messageText.textContent = '単語データの読み込みに失敗しました。';  
-            messageText.style.color = '#e74c3c';  
-        });  
-});  
+.selection-area { 
+    margin-bottom: 30px; 
+} 
 
-// ----------------------------------------------------  
-// UI生成関数 (buildChapterDataは変更なし)  
-// ----------------------------------------------------  
+/* （コメントアウトされていた .categories, .category-item 関連のスタイルは削除しています） */ 
 
-function buildChapterData(data) {  
-    const chapters = {};  
-    data.forEach(word => {  
-        const chapterNum = word.chapter;  
-        const unitNum = word.number;  
-        const unitCategory = word.category;  
+/* ----- 単語カード表示エリアのスタイル ----- */ 
+.card-area { 
+    /* min-height を調整し、コンテンツとボタンを含む十分な高さを確保 */ 
+    min-height: 280px; /* ★調整: 問題文・答え・ボタン全てが入る十分な高さに。以前より少し増やしました */ 
+    display: flex; 
+    flex-direction: column; /* 子要素を縦に並べる */ 
+    justify-content: center; /* 子要素を縦方向中央に配置 (flex-direction: column の場合) */ 
+    align-items: center; /* 子要素を横方向中央に配置 */ 
+    margin-top: 20px; 
+    border: 2px solid #bdc3c7; 
+    border-radius: 8px; 
+    padding: 20px; /* ★調整: 必要であればpadding-bottomも考慮 */ 
+    position: relative; 
+    box-sizing: border-box; /* paddingとborderを要素の高さに含める */ 
+} 
 
-        if (!chapters[chapterNum]) {  
-            chapters[chapterNum] = {  
-                units: {},  
-                words: []  
-            };  
-        }  
-        if (!chapters[chapterNum].units[unitNum]) {  
-             chapters[chapterNum].units[unitNum] = {  
-                categoryName: unitCategory,  
-                words: []  
-            };  
-        }  
-        chapters[chapterNum].units[unitNum].words.push(word);  
-        chapters[chapterNum].words.push(word);  
-    });  
+/* ----- 新規追加: 問題と答えのラッパーのスタイル ----- */ 
+.card-content-wrapper { 
+    flex-grow: 1; /* 親の card-area の中で利用可能なスペースを全て占める */ 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; /* 垂直方向中央揃え */ 
+    align-items: center; /* 水平方向中央揃え */ 
+    width: 100%; /* 親の幅に合わせる */ 
+    min-height: 140px; /* ★重要: 問題と答えの両方が表示される分の最小高さを設定（ここが変動防止のキー） */ 
+    padding: 10px 0; /* ラッパー内部の上下パディング */ 
+    box-sizing: border-box; 
+} 
 
-    const sortedChapters = Object.keys(chapters).sort((a, b) => parseInt(a) - parseInt(b));  
-    const sortedChapterData = {};  
-    sortedChapters.forEach(chapterNum => {  
-        sortedChapterData[chapterNum] = chapters[chapterNum];  
-        const sortedUnitNumbers = Object.keys(chapters[chapterNum].units).sort((a, b) => parseInt(a) - parseInt(b));  
-        const sortedUnits = {};  
-        sortedUnitNumbers.forEach(unitNum => {  
-            sortedUnits[unitNum] = chapters[chapterNum].units[unitNum];  
-        });  
-        sortedChapterData[chapterNum].units = sortedUnits;  
-    });  
+/* ----- 問題文と答えのテキストスタイル ----- */ 
+.card-text { 
+    font-size: 1.6em; /* 適切なフォントサイズに調整 */ 
+    font-weight: bold; 
+    margin: 0; /* pタグのデフォルトマージンをリセット */ 
+    /* min-height, display, align-items, justify-content は card-content-wrapper に任せる */ 
+    text-align: center; 
+    word-wrap: break-word; /* 長い単語がはみ出さずに折り返す */ 
+    white-space: pre-wrap; /* CSV内の改行コード (`\n`) を反映させる */ 
+    max-width: 90%; /* テキストの最大幅 */ 
+    flex-shrink: 0; /* 高さが確保された状態で、テキストが縮まないように */ 
+} 
 
-    return sortedChapterData;  
-}  
+/* 答えが非表示の時のスタイル */ 
+.card-text.hidden { 
+    visibility: hidden; /* ★重要: スペースを保持したまま非表示 */ 
+    position: absolute; /* 他の要素に影響を与えないように位置を固定 */ 
+    /* top, left, transform で親要素の中央に配置（見えないがそこに存在する） */ 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    width: 90%; /* 回答の幅を問題文と合わせる */ 
+    /* display: none; は使わない */ 
+} 
 
+/* ----- ボタンの共通スタイル ----- */ 
+button { 
+    background-color: #3498db; 
+    color: white; 
+    border: none; 
+    padding: 12px 25px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-size: 1.1em; 
+    margin: 10px 10px; /* ボタン間のスペース */ 
+    transition: background-color 0.3s ease; 
+} 
 
-// 章と単元の選択肢を生成する関数 (変更なし)  
-function generateChapterSelection() {  
-    chaptersContainer.innerHTML = ''; // 既存の内容をクリア  
+button:hover { 
+    background-color: #2980b9; 
+} 
 
-    for (const chapterNum in chapterData) {  
-        const chapter = chapterData[chapterNum];  
+button:active { 
+    transform: translateY(1px); 
+} 
 
-        const chapterItem = document.createElement('div');  
-        chapterItem.className = 'chapter-item';  
-        chapterItem.dataset.chapterNum = chapterNum;  
+#message { 
+    margin-top: 20px; 
+    font-size: 1.2em; 
+    color: #e74c3c; 
+} 
 
-        const chapterHeader = document.createElement('div');  
-        chapterHeader.className = 'chapter-header';  
-        chapterHeader.innerHTML = `  
-            <span class="chapter-title">第${chapterNum}章</span>  
-            <div class="chapter-options">  
-                <button class="select-all-chapter-btn" data-chapter="${chapterNum}">全て選択</button>  
-                <span class="toggle-icon">▶</span>  
-            </div>  
-        `;  
-        chapterItem.appendChild(chapterHeader);  
+/* ----- 章と単元の選択エリアのスタイル ----- */ 
+.chapters-container { 
+    margin-top: 20px; 
+    text-align: left; /* 左寄せにする */ 
+} 
 
-        const unitList = document.createElement('div');  
-        unitList.className = 'unit-list';  
-          
-        for (const unitNum in chapter.units) {  
-            const unit = chapter.units[unitNum];  
-            const unitItem = document.createElement('div');  
-            unitItem.className = 'unit-item';  
-            unitItem.innerHTML = `  
-                <input type="checkbox" id="unit-${chapterNum}-${unitNum}" value="${unitNum}" data-chapter="${chapterNum}">  
-                <label for="unit-${chapterNum}-${unitNum}">${unitNum}. ${unit.categoryName}</label>  
-            `;  
-            unitList.appendChild(unitItem);  
-        }  
-        chapterItem.appendChild(unitList);  
-        chaptersContainer.appendChild(chapterItem);  
+.chapter-item { 
+    background-color: #ecf0f1; 
+    border-radius: 8px; 
+    margin-bottom: 10px; 
+    overflow: hidden; /* 章が閉じたときに中身が見えないように */ 
+} 
 
-        // イベントリスナーを追加  
-        chapterHeader.addEventListener('click', (event) => {  
-            if (!event.target.closest('.select-all-chapter-btn')) {  
-                chapterHeader.classList.toggle('expanded');  
-            }  
-        });  
+.chapter-header { 
+    display: flex; 
+    align-items: center; 
+    padding: 12px 15px; 
+    cursor: pointer; 
+    background-color: #bdc3c7; 
+    color: #2c3e50; 
+    font-weight: bold; 
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
+    transition: background-color 0.3s ease; 
+} 
 
-        const selectAllButton = chapterHeader.querySelector('.select-all-chapter-btn');  
-        selectAllButton.addEventListener('click', (event) => {  
-            event.stopPropagation();  
+.chapter-header:hover { 
+    background-color: #aeb5b8; 
+} 
 
-            const allUnitCheckboxes = chapterItem.querySelectorAll('.unit-list input[type="checkbox"]');  
-            const isAllChecked = Array.from(allUnitCheckboxes).every(cb => cb.checked);  
+.chapter-header .chapter-title { 
+    flex-grow: 1; /* タイトルが余白を占める */ 
+} 
 
-            allUnitCheckboxes.forEach(checkbox => {  
-                checkbox.checked = !isAllChecked;  
-            });  
-        });  
-    }  
-}  
+.chapter-header .toggle-icon { 
+    font-size: 1.5em; 
+    margin-left: 10px; 
+    transition: transform 0.3s ease; 
+} 
 
+.chapter-header.expanded .toggle-icon { 
+    transform: rotate(90deg); /* 展開時に矢印を回転 */ 
+} 
 
-// ----------------------------------------------------  
-// イベントリスナーの追加  
-// ----------------------------------------------------  
+.chapter-options { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-left: auto; /* 右寄せ */ 
+} 
 
-startButton.addEventListener('click', () => {  
-    const selectedUnitNumbers = Array.from(document.querySelectorAll('.unit-list input[type="checkbox"]:checked'))  
-                                     .map(checkbox => checkbox.value);  
-      
-    if (selectedUnitNumbers.length === 0) {  
-        alert('出題範囲（単元）を一つ以上選択してください。');  
-        return;  
-    }  
+.chapter-options button { 
+    padding: 6px 12px; 
+    font-size: 0.9em; 
+    margin: 0; /* マージンを調整 */ 
+} 
 
-    selectedWords = wordData.filter(word => selectedUnitNumbers.includes(word.number));  
-      
-    if (selectedWords.length === 0) {  
-        alert('選択された範囲に単語がありません。');  
-        return;  
-    }  
+.unit-list { 
+    padding: 0 15px; /* 上下のパディングを0に変更 */ 
+    background-color: #f8f8f8; 
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out; 
+} 
 
-    // 出題数を取得  
-    let selectedCount = document.querySelector('input[name="questionCount"]:checked').value;  
-      
-    // selectedWordsをシャッフル  
-    shuffleArray(selectedWords);  
+.chapter-header.expanded + .unit-list { 
+    max-height: 500px; /* 展開時の最大高さを設定（コンテンツに合わせて調整） */ 
+    padding-top: 15px; /* 展開時にパディングを適用 */ 
+    padding-bottom: 15px; /* 展開時にパディングを適用 */ 
+} 
 
-    // 出題数に基づいてwordsForQuizを調整  
-    if (selectedCount === 'all') {  
-        wordsForQuiz = [...selectedWords]; // 全問  
-    } else {  
-        const count = parseInt(selectedCount, 10);  
-        wordsForQuiz = selectedWords.slice(0, count); // 指定された数だけ抽出  
-        if (wordsForQuiz.length < count) {  
-            // 選択された単語が指定数より少ない場合  
-            alert(`選択された単語が${count}問に満たないため、${wordsForQuiz.length}問出題します。`);  
-        }  
-    }  
+.unit-item { 
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 8px; 
+} 
 
+.unit-item:last-child { 
+    margin-bottom: 0; 
+} 
 
-    currentWordIndex = 0;  
+.unit-item input[type="checkbox"] { 
+    margin-right: 8px; 
+} 
 
-    selectionArea.style.display = 'none';  
-    cardArea.style.display = 'flex';  
+/* ----- 出題数選択エリアのスタイル ----- */ 
+.question-count-selection { 
+    margin-bottom: 25px; 
+    padding: 15px; 
+    background-color: #ecf0f1; 
+    border-radius: 8px; 
+} 
 
-    displayCurrentWord();  
-});  
+.question-count-selection h3 { 
+    margin-top: 0; 
+    margin-bottom: 15px; 
+    color: #34495e; 
+} 
 
-toggleButton.addEventListener('click', () => {  
-    if (isQuestionDisplayed) {  
-        answerText.classList.remove('hidden');  
-        toggleButton.textContent = '隠す';  
-        isQuestionDisplayed = false;  
-    } else {  
-        answerText.classList.add('hidden');  
-        toggleButton.textContent = '答えを見る';  
-        isQuestionDisplayed = true;  
-    }  
-});  
+.count-options { 
+    display: flex; 
+    justify-content: center; 
+    gap: 20px; 
+    flex-wrap: wrap; /* 小さい画面で折り返す */ 
+} 
 
-nextButton.addEventListener('click', () => {  
-    currentWordIndex++;  
+.count-item { 
+    display: flex; 
+    align-items: center; 
+    cursor: pointer; 
+    font-size: 1.1em; 
+} 
 
-    // 次の単語に進む際はwordsForQuizを使用  
-    if (currentWordIndex < wordsForQuiz.length) {  
-        displayCurrentWord();  
-    } else {  
-        // 全ての単語が終了した場合  
-        cardArea.style.display = 'none';  
-        messageText.textContent = `学習終了！${wordsForQuiz.length}問を学習しました。お疲れ様でした。`;  
-        messageText.style.color = '#27ae60';  
-        startButton.textContent = 'もう一度学習する'; // 「学習開始」ボタンのテキストを「もう一度学習する」に戻す  
-        selectionArea.style.display = 'block'; // 選択画面に戻る  
-    }  
-});  
+.count-item input[type="radio"] { 
+    margin-right: 8px; 
+    transform: scale(1.2); /* ラジオボタンを少し大きく */ 
+} 
 
-// 新規追加：範囲選択に戻るボタンのイベントリスナー  
-backToSelectionButton.addEventListener('click', () => {  
-    cardArea.style.display = 'none';  
-    selectionArea.style.display = 'block';  
-    messageText.textContent = ''; // メッセージをクリア  
-});  
+/* ----- カード表示エリアのボタン群のスタイル ----- */ 
+.button-group { 
+    display: flex; 
+    justify-content: center; 
+    margin-top: auto; /* card-content-wrapper の下に自動的に配置 */ 
+    margin-bottom: 0; /* 下部のマージンをリセット */ 
+    flex-wrap: wrap; 
+    width: 100%; /* 親要素に合わせる */ 
+    padding-top: 15px; /* ボタン群とテキストの間に余白 */ 
+    box-sizing: border-box; 
+} 
 
+.button-group button { 
+    margin: 5px 10px; /* ボタン間のスペース */ 
+} 
 
-// ----------------------------------------------------  
-// ヘルパー関数 (parseCSV関数は変更なし)  
-// ----------------------------------------------------  
+/* ----- 範囲選択に戻るボタンのスタイル ----- */ 
+.secondary-button { 
+    background-color: #95a5a6; /* 少し暗い色 */ 
+    color: white; 
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-size: 0.95em; 
+    margin-top: 20px; /* .button-group との間に適切なスペース */ 
+    transition: background-color 0.3s ease; 
+} 
 
-function displayCurrentWord() {  
-    // 表示する単語はwordsForQuizから取得  
-    const currentWord = wordsForQuiz[currentWordIndex];  
-    questionText.textContent = currentWord.question;  
-    answerText.textContent = currentWord.answer;  
-    answerText.classList.add('hidden');  
-    toggleButton.textContent = '答えを見る';  
-    isQuestionDisplayed = true;  
-    messageText.textContent = '';  
-}  
-
-function shuffleArray(array) {  
-    for (let i = array.length - 1; i > 0; i--) {  
-        const j = Math.floor(Math.random() * (i + 1));  
-        [array[i], array[j]] = [array[j], array[i]];  
-    }  
-}  
-
-// CSVテキストをパースしてオブジェクトの配列に変換する関数 (変更なし)  
-function parseCSV(csvText) {  
-    const lines = csvText.trim().split('\n');  
-    const headers = lines[0].split(',').map(header => header.trim());  
-
-    const result = [];  
-    for (let i = 1; i < lines.length; i++) {  
-        if (lines[i].trim() === '') continue;  
-        const values = parseCSVLine(lines[i]);  
-        const obj = {};  
-        for (let j = 0; j < headers.length; j++) {  
-            obj[headers[j]] = values[j] ? values[j].trim() : '';  
-        }  
-        result.push(obj);  
-    }  
-    return result;  
-}  
-
-// CSVの行を適切にパースする（カンマを含む値に対応） (変更なし)  
-function parseCSVLine(line) {  
-    const values = [];  
-    let inQuote = false;  
-    let currentVal = '';  
-
-    for (let i = 0; i < line.length; i++) {  
-        const char = line[i];  
-        if (char === '"') {  
-            if (inQuote && i + 1 < line.length && line[i + 1] === '"') {  
-                currentVal += '"';  
-                i++;  
-            } else {  
-                inQuote = !inQuote;  
-            }  
-        } else if (char === ',' && !inQuote) {  
-            values.push(currentVal);  
-            currentVal = '';  
-        } else {  
-            currentVal += char;  
-        }  
-    }  
-    values.push(currentVal);  
-    return values;  
+.secondary-button:hover { 
+    background-color: #7f8c8d; 
 }
