@@ -34,38 +34,12 @@ h2 {
     margin-bottom: 30px;
 }
 
-/*
-.categories {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.category-item {
-    display: flex;
-    align-items: center;
-    background-color: #ecf0f1;
-    padding: 10px 15px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.category-item:hover {
-    background-color: #dde1e2;
-}
-
-.category-item input[type="checkbox"] {
-    margin-right: 8px;
-}
-*/
+/* （コメントアウトされていた .categories, .category-item 関連のスタイルは削除しています） */
 
 /* ----- 単語カード表示エリアのスタイル ----- */
 .card-area {
     /* min-height を調整し、コンテンツとボタンを含む十分な高さを確保 */
-    min-height: 250px; /* ★調整: 問題文・答え・ボタン全てが入る十分な高さに */
+    min-height: 280px; /* ★調整: 問題文・答え・ボタン全てが入る十分な高さに。以前より少し増やしました */
     display: flex;
     flex-direction: column; /* 子要素を縦に並べる */
     justify-content: center; /* 子要素を縦方向中央に配置 (flex-direction: column の場合) */
@@ -75,31 +49,45 @@ h2 {
     border-radius: 8px;
     padding: 20px; /* ★調整: 必要であればpadding-bottomも考慮 */
     position: relative;
-    box-sizing: border-box; /* ★追加: paddingとborderを要素の高さに含める */
+    box-sizing: border-box; /* paddingとborderを要素の高さに含める */
+}
+
+/* ----- 新規追加: 問題と答えのラッパーのスタイル ----- */
+.card-content-wrapper {
+    flex-grow: 1; /* 親の card-area の中で利用可能なスペースを全て占める */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 垂直方向中央揃え */
+    align-items: center; /* 水平方向中央揃え */
+    width: 100%; /* 親の幅に合わせる */
+    min-height: 140px; /* ★重要: 問題と答えの両方が表示される分の最小高さを設定（ここが変動防止のキー） */
+    padding: 10px 0; /* ラッパー内部の上下パディング */
+    box-sizing: border-box;
 }
 
 /* ----- 問題文と答えのテキストスタイル ----- */
 .card-text {
     font-size: 1.6em; /* 適切なフォントサイズに調整 */
     font-weight: bold;
-    margin: 0; /* ★重要: pタグのデフォルトマージンをリセット */
-    margin-bottom: 20px; /* 必要に応じて下部のマージンのみ指定 */
-    color: #34495e;
-    /* min-height でテキストエリアの高さを固定/最小化 */
-    min-height: 80px; /* ★調整: テキストの量に応じて最適な最小高さを設定 */
-    /* Flexboxでテキストを領域内で中央揃え */
-    display: flex;
-    align-items: center; /* 垂直方向中央 */
-    justify-content: center; /* 水平方向中央 */
-    text-align: center; /* テキストアライメント（flexboxと併用） */
+    margin: 0; /* pタグのデフォルトマージンをリセット */
+    /* min-height, display, align-items, justify-content は card-content-wrapper に任せる */
+    text-align: center;
     word-wrap: break-word; /* 長い単語がはみ出さずに折り返す */
     white-space: pre-wrap; /* CSV内の改行コード (`\n`) を反映させる */
     max-width: 90%; /* テキストの最大幅 */
     flex-shrink: 0; /* 高さが確保された状態で、テキストが縮まないように */
 }
 
+/* 答えが非表示の時のスタイル */
 .card-text.hidden {
-    display: none;
+    visibility: hidden; /* ★重要: スペースを保持したまま非表示 */
+    position: absolute; /* 他の要素に影響を与えないように位置を固定 */
+    /* top, left, transform で親要素の中央に配置（見えないがそこに存在する） */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; /* 回答の幅を問題文と合わせる */
+    /* display: none; は使わない */
 }
 
 /* ----- ボタンの共通スタイル ----- */
@@ -250,12 +238,12 @@ button:active {
 .button-group {
     display: flex;
     justify-content: center;
-    margin-top: auto; /* ★変更: これで .card-area の下部に自動的に配置 */
+    margin-top: auto; /* card-content-wrapper の下に自動的に配置 */
     margin-bottom: 0; /* 下部のマージンをリセット */
     flex-wrap: wrap;
     width: 100%; /* 親要素に合わせる */
     padding-top: 15px; /* ボタン群とテキストの間に余白 */
-    box-sizing: border-box; /* padding を幅と高さに含める */
+    box-sizing: border-box;
 }
 
 .button-group button {
@@ -271,7 +259,7 @@ button:active {
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.95em;
-    margin-top: 20px; /* ★調整: .button-group との間に適切なスペース */
+    margin-top: 20px; /* .button-group との間に適切なスペース */
     transition: background-color 0.3s ease;
 }
 
