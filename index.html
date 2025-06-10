@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>世界史単語帳</title>
+    <title>世界史めくる単語帳</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>世界史単語帳</h1>
+        <h1>世界史めくる単語帳</h1>
 
         <div class="selection-area">
             <h2>出題範囲を選択</h2>
@@ -37,8 +37,10 @@
         </div>
 
         <div class="card-area" style="display: none;">
-            <p id="question" class="card-text"></p>
-            <p id="answer" class="card-text hidden"></p>
+            <div class="card-content-wrapper">
+                <p id="question" class="card-text"></p>
+                <p id="answer" class="card-text hidden"></p>
+            </div>
             <div class="button-group">
                 <button id="toggleButton">答えを見る</button>
                 <button id="nextButton">次の問題へ</button>
