@@ -34,6 +34,7 @@ h2 {
     margin-bottom: 30px;
 }
 
+/*
 .categories {
     display: flex;
     flex-wrap: wrap;
@@ -59,32 +60,49 @@ h2 {
 .category-item input[type="checkbox"] {
     margin-right: 8px;
 }
+*/
 
+/* ----- 単語カード表示エリアのスタイル ----- */
 .card-area {
-    min-height: 200px; /* カードの高さ確保 */
+    /* min-height を調整し、コンテンツとボタンを含む十分な高さを確保 */
+    min-height: 250px; /* ★調整: 問題文・答え・ボタン全てが入る十分な高さに */
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column; /* 子要素を縦に並べる */
+    justify-content: center; /* 子要素を縦方向中央に配置 (flex-direction: column の場合) */
+    align-items: center; /* 子要素を横方向中央に配置 */
     margin-top: 20px;
     border: 2px solid #bdc3c7;
     border-radius: 8px;
-    padding: 20px;
+    padding: 20px; /* ★調整: 必要であればpadding-bottomも考慮 */
     position: relative;
+    box-sizing: border-box; /* ★追加: paddingとborderを要素の高さに含める */
 }
 
+/* ----- 問題文と答えのテキストスタイル ----- */
 .card-text {
-    font-size: 1.8em;
+    font-size: 1.6em; /* 適切なフォントサイズに調整 */
     font-weight: bold;
-    margin: 10px 0;
-    word-wrap: break-word; /* 長い単語の折り返し */
-    max-width: 90%;
+    margin: 0; /* ★重要: pタグのデフォルトマージンをリセット */
+    margin-bottom: 20px; /* 必要に応じて下部のマージンのみ指定 */
+    color: #34495e;
+    /* min-height でテキストエリアの高さを固定/最小化 */
+    min-height: 80px; /* ★調整: テキストの量に応じて最適な最小高さを設定 */
+    /* Flexboxでテキストを領域内で中央揃え */
+    display: flex;
+    align-items: center; /* 垂直方向中央 */
+    justify-content: center; /* 水平方向中央 */
+    text-align: center; /* テキストアライメント（flexboxと併用） */
+    word-wrap: break-word; /* 長い単語がはみ出さずに折り返す */
+    white-space: pre-wrap; /* CSV内の改行コード (`\n`) を反映させる */
+    max-width: 90%; /* テキストの最大幅 */
+    flex-shrink: 0; /* 高さが確保された状態で、テキストが縮まないように */
 }
 
 .card-text.hidden {
     display: none;
 }
 
+/* ----- ボタンの共通スタイル ----- */
 button {
     background-color: #3498db;
     color: white;
@@ -111,16 +129,17 @@ button:active {
     color: #e74c3c;
 }
 
+/* ----- 章と単元の選択エリアのスタイル ----- */
 .chapters-container {
     margin-top: 20px;
     text-align: left; /* 左寄せにする */
 }
 
 .chapter-item {
-background-color: #ecf0f1;
-border-radius: 8px;
-margin-bottom: 10px;
-overflow: hidden; / 追加 /
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden; /* 章が閉じたときに中身が見えないように */
 }
 
 .chapter-header {
@@ -175,7 +194,7 @@ overflow: hidden; / 追加 /
 }
 
 .chapter-header.expanded + .unit-list {
-    max-height: 500px;
+    max-height: 500px; /* 展開時の最大高さを設定（コンテンツに合わせて調整） */
     padding-top: 15px; /* 展開時にパディングを適用 */
     padding-bottom: 15px; /* 展開時にパディングを適用 */
 }
@@ -194,6 +213,7 @@ overflow: hidden; / 追加 /
     margin-right: 8px;
 }
 
+/* ----- 出題数選択エリアのスタイル ----- */
 .question-count-selection {
     margin-bottom: 25px;
     padding: 15px;
@@ -226,20 +246,23 @@ overflow: hidden; / 追加 /
     transform: scale(1.2); /* ラジオボタンを少し大きく */
 }
 
-/* カード表示エリアのボタン間隔調整 */
+/* ----- カード表示エリアのボタン群のスタイル ----- */
 .button-group {
     display: flex;
     justify-content: center;
-    margin-top: 15px; /* 上部の余白 */
-    margin-bottom: 20px; /* 下部の余白 */
-    flex-wrap: wrap; /* 小さい画面で折り返す */
+    margin-top: auto; /* ★変更: これで .card-area の下部に自動的に配置 */
+    margin-bottom: 0; /* 下部のマージンをリセット */
+    flex-wrap: wrap;
+    width: 100%; /* 親要素に合わせる */
+    padding-top: 15px; /* ボタン群とテキストの間に余白 */
+    box-sizing: border-box; /* padding を幅と高さに含める */
 }
 
 .button-group button {
     margin: 5px 10px; /* ボタン間のスペース */
 }
 
-/* 範囲選択に戻るボタンのスタイル */
+/* ----- 範囲選択に戻るボタンのスタイル ----- */
 .secondary-button {
     background-color: #95a5a6; /* 少し暗い色 */
     color: white;
@@ -248,68 +271,10 @@ overflow: hidden; / 追加 /
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.95em;
-    margin-top: 15px;
+    margin-top: 20px; /* ★調整: .button-group との間に適切なスペース */
     transition: background-color 0.3s ease;
 }
 
 .secondary-button:hover {
     background-color: #7f8c8d;
-}
-
-/* 既存のstyle.cssに以下を追加または修正・確認 */
-
-.card-text {
-    font-size: 1.6em;
-    margin-bottom: 20px;
-    color: #34495e;
-    min-height: 80px; /* ★ここを修正または追加: 問題文と答えの最小高さを設定。適切な高さに調整してください */
-    display: flex; /* ★追加: テキストの垂直方向中央揃えのため */
-    align-items: center; /* ★追加: テキストの垂直方向中央揃えのため */
-    justify-content: center; /* ★追加: テキストの水平方向中央揃えのため */
-    text-align: center; /* ★追加: テキストの水平方向中央揃えのため (flexboxのjustify-contentと併用) */
-    word-wrap: break-word; /* ★追加: 長い単語や文が枠からはみ出さずに折り返す */
-    white-space: pre-wrap; /* ★追加: CSV内の改行コード (`\n`) を反映させる */
-}
-
-/* カード表示エリアのボタン間隔調整 (以前の指示とほぼ同じですが、再確認) */
-.button-group {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px; /* 上部の余白 */
-    margin-bottom: 20px; /* 下部の余白。もしボタン間のスペースが足りなければ調整 */
-    flex-wrap: wrap; /* 小さい画面で折り返す */
-}
-
-.button-group button {
-    margin: 5px 10px; /* ボタン間のスペース */
-}
-
-/* 範囲選択に戻るボタンのスタイル (以前の指示とほぼ同じですが、再確認) */
-.secondary-button {
-    background-color: #95a5a6;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.95em;
-    margin-top: 15px; /* 上部の余白で位置調整。必要であれば調整 */
-    transition: background-color 0.3s ease;
-}
-
-.secondary-button:hover {
-    background-color: #7f8c8d;
-}
-
-/* card-area自体のpadding-bottomも調整して、一番下のボタンとの間隔を確保 */
-.card-area {
-    background-color: #ffffff;
-    padding: 30px; /* もし全体の枠の高さがまだ変動するようであれば、padding-bottomを調整 */
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 90%;
-    max-width: 600px;
-    /* 必要であれば、max-widthを超えた場合の横スクロールバーや、コンテンツがはみ出さないためのoverflow-x: hidden; */
-    /* overflow-x: hidden; */
 }
