@@ -1,3 +1,66 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* display: flex;  元のflexbox設定は削除または調整 */
+    /* justify-content: center; */
+    /* align-items: center; */
+    min-height: 100vh;
+    background-color: #f4f7f6;
+    margin: 0;
+    color: #333;
+    padding: 20px; /* 全体に少しパディングを追加して端に寄りすぎないように */
+    box-sizing: border-box; /* パディングを含めて要素の幅・高さを計算 */
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto; /* 中央揃えと上下のマージン */
+    display: flex; /* コンテナ自体をflexboxコンテナにする */
+    flex-direction: column; /* 子要素を縦に並べる */
+    align-items: center; /* 子要素を中央に配置 */
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.selection-area,
+.card-area,
+.results-area {
+    width: 100%; /* それぞれのエリアがコンテナの幅を占めるように */
+    /* display: none; はJavaScriptで制御 */
+    margin-bottom: 20px; /* 各エリアの下に余白 */
+}
+
+/* （コメントアウトされていた .categories, .category-item 関連のスタイルは削除しています） */
+
+/* ----- 単語カード表示エリアのスタイル ----- */
+.card-area {
+    min-height: 280px;
+    display: flex; /* JavaScriptで制御するため、ここでの初期値は不要 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    border: 2px solid #bdc3c7;
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    box-sizing: border-box;
+}
+
 /* 進捗表示のスタイル */
 .progress-text {
     font-size: 1.1em;
@@ -6,11 +69,67 @@
     font-weight: bold;
 }
 
+/* ----- 新規追加: 問題と答えのラッパーのスタイル ----- */
+.card-content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 140px;
+    padding: 10px 0;
+    box-sizing: border-box;
+}
+
+/* ----- 問題文と答えのテキストスタイル ----- */
+.card-text {
+    font-size: 1.6em;
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 90%;
+    flex-shrink: 0;
+}
+
+/* 答えが非表示の時のスタイル */
+.card-text.hidden {
+    visibility: hidden;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+}
+
+/* ----- ボタンの共通スタイル ----- */
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin: 10px 10px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
 /* 正誤判定ボタンのスタイル */
 .judge-button {
     padding: 10px 20px;
     font-size: 1em;
-    margin: 5px; /* ボタン間のスペースを少し調整 */
+    margin: 5px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -36,29 +155,175 @@
     background-color: #c0392b;
 }
 
-/* カード表示エリアのボタン群のスタイル（修正） */
-/* 正誤ボタン表示時にも適切に配置されるようflex-wrapとjustify-contentを調整 */
+#message {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #e74c3c;
+}
+
+/* ----- 章と単元の選択エリアのスタイル ----- */
+.chapters-container {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.chapter-item {
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.chapter-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    background-color: #bdc3c7;
+    color: #2c3e50;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.chapter-header:hover {
+    background-color: #aeb5b8;
+}
+
+.chapter-header .chapter-title {
+    flex-grow: 1;
+}
+
+.chapter-header .toggle-icon {
+    font-size: 1.5em;
+    margin-left: 10px;
+    transition: transform 0.3s ease;
+}
+
+.chapter-header.expanded .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.chapter-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.chapter-options button {
+    padding: 6px 12px;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.unit-list {
+    padding: 0 15px;
+    background-color: #f8f8f8;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.chapter-header.expanded + .unit-list {
+    max-height: 500px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.unit-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.unit-item:last-child {
+    margin-bottom: 0;
+}
+
+.unit-item input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+/* ----- 出題数選択エリアのスタイル ----- */
+.question-count-selection {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    width: 100%; /* コンテナの幅いっぱいに広げる */
+    box-sizing: border-box; /* パディングを含める */
+}
+
+.question-count-selection h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #34495e;
+}
+
+.count-options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.count-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+.count-item input[type="radio"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+/* ----- カード表示エリアのボタン群のスタイル ----- */
 .button-group {
     display: flex;
-    justify-content: center; /* 中央寄せ */
+    justify-content: center;
     margin-top: auto;
     margin-bottom: 0;
-    flex-wrap: wrap; /* ボタンが多くなった時に折り返す */
+    flex-wrap: wrap;
     width: 100%;
     padding-top: 15px;
     box-sizing: border-box;
 }
 
+.button-group button {
+    margin: 5px 10px;
+}
+
+/* ----- 範囲選択に戻るボタンのスタイル ----- */
+.secondary-button {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.secondary-button:hover {
+    background-color: #7f8c8d;
+}
+
 /* --- 結果表示エリアのスタイル --- */
 .results-area {
+    /* display: none; はJavaScriptで制御 */
     background-color: #ffffff;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    width: 90%;
-    max-width: 600px;
-    margin-top: 20px; /* 他のコンテンツとの間にスペース */
+    width: 100%; /* コンテナの幅いっぱいに広げる */
+    box-sizing: border-box;
+    margin-top: 20px;
 }
 
 .results-area h2 {
@@ -80,16 +345,16 @@
 }
 
 #incorrectWordsList {
-    list-style: none; /* デフォルトのリストスタイルをなくす */
+    list-style: none;
     padding: 0;
-    margin: 0 auto 20px auto; /* 中央寄せと下マージン */
-    max-height: 200px; /* リストが長くなった場合にスクロールできるように */
+    margin: 0 auto 20px auto;
+    max-height: 200px;
     overflow-y: auto;
     border: 1px solid #ddd;
     border-radius: 5px;
     background-color: #f9f9f9;
     width: 90%;
-    text-align: left; /* リスト項目を左寄せ */
+    text-align: left;
 }
 
 #incorrectWordsList li {
@@ -105,5 +370,42 @@
 
 /* 結果エリアのボタン群 */
 .results-area button {
-    margin: 10px; /* ボタン間のスペース */
+    margin: 10px;
+}
+
+/* メディアクエリ: 小さい画面での調整 */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 10px auto;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .card-text {
+        font-size: 1.4em;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+
+    .button-group {
+        flex-direction: column; /* ボタンを縦に並べる */
+        gap: 10px; /* ボタン間の隙間を調整 */
+    }
+
+    .button-group button {
+        width: 80%; /* ボタンの幅を調整 */
+        margin: 0 auto; /* 中央寄せ */
+    }
+
+    .count-options {
+        flex-direction: column; /* ラジオボタンを縦に並べる */
+        align-items: flex-start; /* 左寄せ */
+        gap: 10px;
+    }
 }
